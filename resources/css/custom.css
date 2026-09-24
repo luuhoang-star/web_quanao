@@ -1,0 +1,810 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* Custom Stylesheet for Atino Minimalist & Modern Fashion Theme */
+
+:root {
+    --minimal-bg: #f8fafc;
+    --minimal-card-bg: #ffffff;
+    --minimal-text: #0f172a;
+    --minimal-muted: #64748b;
+    --minimal-border: #e2e8f0;
+    --minimal-light-bg: #f1f5f9;
+    --minimal-accent: #0f172a;
+    --minimal-primary: #4f46e5;
+    --minimal-danger: #e11d48;
+    --minimal-warning: #f59e0b;
+    --minimal-success: #10b981;
+    --minimal-radius: 16px;
+    --minimal-shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
+    --minimal-shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
+    --minimal-shadow-hover: 0 16px 32px -8px rgba(15, 23, 42, 0.12);
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--minimal-bg);
+    color: var(--minimal-text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    letter-spacing: -0.015em;
+    -webkit-font-smoothing: antialiased;
+}
+
+main {
+    flex: 1;
+}
+
+/* Glassmorphism Header */
+.atino-header-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 1040;
+    background: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    transition: all 0.3s ease;
+}
+
+.promo-top-bar {
+    background: linear-gradient(90deg, #0f172a 0%, #1e1b4b 100%);
+    color: #ffffff;
+    font-size: 0.775rem;
+    letter-spacing: 0.03em;
+    padding: 0.45rem 1rem;
+}
+
+/* Header Styles */
+.minimal-topbar {
+    background-color: #fafafa;
+    border-bottom: 1px solid var(--minimal-border);
+    font-size: 0.8rem;
+    color: var(--minimal-muted);
+}
+
+.minimal-topbar a {
+    color: var(--minimal-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.minimal-topbar a:hover {
+    color: var(--minimal-text);
+}
+
+.minimal-logo {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--minimal-text);
+    text-decoration: none;
+}
+
+.minimal-nav-link {
+    color: var(--minimal-text) !important;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    padding: 0.8rem 0.9rem !important;
+    transition: color 0.2s ease;
+}
+
+.minimal-nav-link:hover,
+.minimal-nav-link.active {
+    color: var(--minimal-primary) !important;
+}
+
+.search-input-minimal {
+    border-radius: 50rem;
+    border: 1px solid var(--minimal-border);
+    padding: 0.45rem 1.1rem;
+    font-size: 0.85rem;
+    background-color: #ffffff;
+    transition: all 0.25s ease;
+}
+
+.search-input-minimal:focus {
+    border-color: var(--minimal-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
+/* Product Card Styling */
+.atino-product-card {
+    border: 1px solid #e2e8f0 !important;
+    background: #ffffff !important;
+    border-radius: 16px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.atino-product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 36px -10px rgba(15, 23, 42, 0.12) !important;
+    border-color: #0f172a !important;
+}
+
+.atino-img-container {
+    position: relative;
+    background: #f8fafc;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 3 / 4;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.atino-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.atino-product-card:hover .atino-img-container img {
+    transform: scale(1.06);
+}
+
+/* Size Pills Styling */
+.product-size-pill {
+    font-size: 0.725rem;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem;
+    border-radius: 8px;
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+}
+
+.product-size-pill:hover,
+.product-size-pill.active {
+    background: #0f172a !important;
+    color: #ffffff !important;
+    border-color: #0f172a !important;
+}
+
+/* CTA Button Styling */
+.btn-add-to-cart {
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+    border: none !important;
+    font-size: 0.875rem !important;
+    letter-spacing: 0.02em !important;
+    transition: all 0.25s ease !important;
+}
+
+.btn-add-to-cart:hover {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25) !important;
+}
+
+/* Dynamic Aesthetic Product Placeholder */
+.atino-placeholder-box {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, #f1f5f9 0%, #e2e8f0 100%);
+    color: #475569;
+    padding: 1rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.atino-placeholder-box::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, transparent 60%);
+    transform: rotate(30deg);
+    pointer-events: none;
+}
+
+.atino-placeholder-icon {
+    font-size: 2.8rem;
+    color: #4f46e5;
+    margin-bottom: 0.5rem;
+    filter: drop-shadow(0 4px 6px rgba(79, 70, 229, 0.15));
+    transition: transform 0.3s ease;
+}
+
+.atino-product-card:hover .atino-placeholder-icon {
+    transform: translateY(-3px) scale(1.1);
+}
+
+/* Badges */
+.badge-discount-red {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.725rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(225, 29, 72, 0.3);
+    z-index: 2;
+}
+
+.btn-quick-cart {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #0f172a;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+}
+
+.btn-quick-cart:hover {
+    background: #0f172a;
+    color: #ffffff;
+    border-color: #0f172a;
+    transform: scale(1.08);
+}
+
+/* Progress bar for Flash Sale */
+.sale-progress-bar {
+    height: 6px;
+    border-radius: 50rem;
+    background-color: #ffe4e6;
+    overflow: hidden;
+}
+
+.sale-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #e11d48 0%, #f43f5e 100%);
+    border-radius: 50rem;
+}
+
+/* Account Page Minimalism */
+.account-title {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--minimal-text);
+}
+
+.account-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-bottom: 2px solid var(--minimal-text);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.25rem;
+    color: var(--minimal-text);
+}
+
+.account-nav-list .list-group-item {
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    color: #404040;
+    margin-bottom: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.account-nav-list .list-group-item:hover,
+.account-nav-list .list-group-item.active {
+    background-color: var(--minimal-light-bg);
+    color: var(--minimal-text);
+    font-weight: 600;
+}
+
+/* Profile Dashboard Modern Styles */
+.profile-user-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+}
+
+#v-pills-tab .nav-link {
+    color: #334155 !important;
+    background-color: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    padding: 0.85rem 1.25rem !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+#v-pills-tab .nav-link i {
+    color: #64748b !important;
+}
+
+#v-pills-tab .nav-link:hover {
+    background-color: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+#v-pills-tab .nav-link:hover i {
+    color: #0f172a !important;
+}
+
+#v-pills-tab .nav-link.active {
+    background-color: #0f172a !important;
+    border-color: #0f172a !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25) !important;
+}
+
+#v-pills-tab .nav-link.active i {
+    color: #ffffff !important;
+}
+
+.coupon-card-ticket {
+    background: #ffffff;
+    border: 1px dashed #cbd5e1;
+    border-radius: 14px;
+    transition: all 0.2s ease;
+}
+
+.coupon-card-ticket:hover {
+    border-color: #0f172a;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+}
+
+/* Full Width Banner */
+.full-width-banner-strip {
+    width: 100%;
+    overflow: hidden;
+    background-color: #171717;
+}
+
+.full-width-banner-strip img {
+    width: 100%;
+    max-height: 380px;
+    object-fit: cover;
+}
+
+/* Footer Minimalist */
+.minimal-footer {
+    background-color: #ffffff;
+    border-top: 1px solid var(--minimal-border);
+    color: var(--minimal-muted);
+    font-size: 0.85rem;
+}
+
+.minimal-footer h6 {
+    color: var(--minimal-text);
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.25rem;
+}
+
+.minimal-footer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.minimal-footer ul li {
+    margin-bottom: 0.6rem;
+}
+
+.minimal-footer ul li a {
+    color: var(--minimal-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.minimal-footer ul li a:hover {
+    color: var(--minimal-text);
+}
+
+/* ==========================================================================
+   Checkout, Cart & Orders Modern UI System
+   ========================================================================== */
+
+/* Modern Checkout Stepper */
+.checkout-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid var(--minimal-border);
+    box-shadow: var(--minimal-shadow-sm);
+    margin-bottom: 2rem;
+}
+
+.checkout-step-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--minimal-muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.checkout-step-item .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: var(--minimal-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.775rem;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.checkout-step-item.completed {
+    color: var(--minimal-text);
+}
+
+.checkout-step-item.completed .step-num {
+    background: #10b981;
+    color: #ffffff;
+}
+
+.checkout-step-item.active {
+    color: var(--minimal-text);
+    font-weight: 700;
+}
+
+.checkout-step-item.active .step-num {
+    background: #0f172a;
+    color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.12);
+}
+
+.checkout-step-divider {
+    flex: 1;
+    max-width: 48px;
+    height: 2px;
+    background: #e2e8f0;
+    border-radius: 2px;
+}
+
+.checkout-step-divider.active {
+    background: #0f172a;
+}
+
+/* Modern Selectable Payment Cards */
+.payment-card-option {
+    border: 2px solid var(--minimal-border);
+    border-radius: 14px;
+    padding: 1.1rem 1.25rem;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    user-select: none;
+}
+
+.payment-card-option:hover {
+    border-color: #cbd5e1;
+    background-color: #f8fafc;
+    transform: translateY(-1px);
+}
+
+.payment-card-option.active {
+    border-color: #0f172a;
+    background-color: #f8fafc;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+}
+
+.payment-card-option .form-check-input {
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+    border-color: #94a3b8;
+    margin-top: 0;
+}
+
+.payment-card-option .form-check-input:checked {
+    background-color: #0f172a;
+    border-color: #0f172a;
+}
+
+/* Bank Transfer & MoMo Detail Containers */
+.payment-expand-container {
+    background: #ffffff;
+    border: 1px solid var(--minimal-border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-top: 1rem;
+    box-shadow: var(--minimal-shadow-sm);
+    animation: fadeInSlideDown 0.3s ease forwards;
+}
+
+@keyframes fadeInSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.bank-info-badge {
+    background: #0f172a;
+    color: #ffffff;
+    font-family: monospace;
+    font-size: 0.95rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: 8px;
+    letter-spacing: 0.05em;
+}
+
+.copy-btn-action {
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #334155;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.copy-btn-action:hover {
+    background: #0f172a;
+    color: #ffffff;
+    border-color: #0f172a;
+}
+
+/* Sticky Checkout Summary Card */
+.sticky-checkout-summary {
+    position: sticky;
+    top: 96px;
+    z-index: 10;
+}
+
+/* Custom Mini Scrollbar */
+.custom-scrollbar-mini {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+.custom-scrollbar-mini::-webkit-scrollbar {
+    width: 5px;
+}
+
+.custom-scrollbar-mini::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar-mini::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 20px;
+}
+
+/* Modern Input Groups with leading icons */
+.input-icon-wrapper {
+    position: relative;
+}
+
+.input-icon-wrapper .input-icon {
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 0.95rem;
+    pointer-events: none;
+    z-index: 4;
+}
+
+.input-icon-wrapper .form-control,
+.input-icon-wrapper .form-select {
+    padding-left: 2.75rem;
+    border-radius: 12px;
+    border: 1.5px solid var(--minimal-border);
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.input-icon-wrapper .form-control:focus,
+.input-icon-wrapper .form-select:focus {
+    border-color: #0f172a;
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+}
+
+.textarea-icon-wrapper {
+    position: relative;
+}
+
+.textarea-icon-wrapper .input-icon {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    color: #94a3b8;
+    font-size: 0.95rem;
+    pointer-events: none;
+    z-index: 4;
+}
+
+.textarea-icon-wrapper .form-control {
+    padding-left: 2.75rem;
+    border-radius: 12px;
+    border: 1.5px solid var(--minimal-border);
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.textarea-icon-wrapper .form-control:focus {
+    border-color: #0f172a;
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+}
+
+/* Trust Badges Grid */
+.trust-badges-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px dashed var(--minimal-border);
+}
+
+.trust-badge-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.775rem;
+    color: var(--minimal-muted);
+    font-weight: 500;
+}
+
+.trust-badge-item i {
+    font-size: 1rem;
+    color: #0f172a;
+}
+
+/* Cart Quantity Pill */
+.cart-qty-pill {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--minimal-border);
+    border-radius: 50rem;
+    background: #ffffff;
+    overflow: hidden;
+    padding: 2px;
+}
+
+.cart-qty-pill .qty-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    color: var(--minimal-text);
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cart-qty-pill .qty-btn:hover {
+    background: #f1f5f9;
+}
+
+.cart-qty-pill input.qty-input {
+    width: 38px;
+    border: none;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--minimal-text);
+    background: transparent;
+    padding: 0;
+}
+
+.cart-qty-pill input.qty-input:focus {
+    outline: none;
+}
+
+/* Freeship Progress Bar in Cart */
+.freeship-banner {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.freeship-progress {
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 50rem;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.freeship-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+    border-radius: 50rem;
+    transition: width 0.4s ease;
+}
+
+/* Product Filter Component Enhancements */
+.opacity-40 {
+    opacity: 0.38 !important;
+}
+
+.text-muted-50 {
+    color: rgba(100, 116, 139, 0.5) !important;
+}
+
+.color-swatch-pill {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.color-swatch-pill.disabled,
+.size-button-pill.disabled {
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+    border-style: dashed !important;
+    opacity: 0.38 !important;
+}
+
+.custom-filter-radio.opacity-40 {
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+    opacity: 0.38 !important;
+}
+
+/* Fix Bootstrap Collapse conflict with Tailwind CSS v4 */
+.shop-filter-form .collapse,
+.accordion-collapse.collapse {
+    visibility: visible !important;
+}
+.shop-filter-form .collapse:not(.show),
+.accordion-collapse.collapse:not(.show) {
+    display: none !important;
+    visibility: hidden !important;
+}
+.shop-filter-form .collapse.show,
+.accordion-collapse.collapse.show {
+    display: block !important;
+    visibility: visible !important;
+}
