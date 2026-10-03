@@ -3,7 +3,7 @@
 @section('title', $product->name . ' - Chi Tiết Sản Phẩm | Atino Store')
 @section('meta_description', Str::limit(strip_tags($product->description ?? 'Mua ngay ' . $product->name . ' thời trang cao cấp tại Atino Store với giá tốt nhất.'), 160))
 @section('og_type', 'product')
-@section('og_image', $product->images->first() ? asset('storage/' . ($product->images->where('is_thumbnail', true)->first()->image_url ?? $product->images->first()->image_url)) : asset('images/logo.png'))
+@section('og_image', $product->image_url)
 
 @push('styles')
 <script type="application/ld+json">
@@ -12,7 +12,7 @@
     "\u0040type": "Product",
     "name": "{{ $product->name }}",
     "image": [
-        "{{ asset('storage/' . ($product->images->where('is_thumbnail', true)->first()->image_url ?? $product->images->first()->image_url ?? '')) }}"
+        "{{ $product->image_url }}"
     ],
     "description": "{{ strip_tags($product->description ?? $product->name) }}",
     "sku": "{{ $product->sku }}",
@@ -174,8 +174,8 @@
                     </button>
 
                     <div class="product-main-img-wrapper" onclick="openImageLightbox()">
-                        @if($thumbnail && $thumbnail->image_url)
-                            <img id="main-product-img" src="{{ asset('storage/' . $thumbnail->image_url) }}" alt="{{ $product->name }}">
+                        @if($thumbnail)
+                            <img id="main-product-img" src="{{ $thumbnail->display_url }}" alt="{{ $product->name }}">
                         @else
                             <div class="d-flex align-items-center justify-content-center text-muted" style="height: 480px;">
                                 <i class="fa-solid fa-shirt fa-6x opacity-25"></i>
@@ -191,9 +191,9 @@
                             <div class="thumb-box bg-white {{ $loop->first ? 'active' : '' }}" 
                                  data-image-id="{{ $img->id }}"
                                  data-color-id="{{ $img->color_id ?? '' }}"
-                                 data-img-url="{{ asset('storage/' . $img->image_url) }}"
-                                 onclick="changeMainImage('{{ asset('storage/' . $img->image_url) }}', this)">
-                                <img src="{{ asset('storage/' . $img->image_url) }}" alt="{{ $product->name }}">
+                                 data-img-url="{{ $img->display_url }}"
+                                 onclick="changeMainImage('{{ $img->display_url }}', this)">
+                                <img src="{{ $img->display_url }}" alt="{{ $product->name }}">
                             </div>
                         @endforeach
                     </div>
@@ -536,7 +536,7 @@
                     @if($review->images && $review->images->isNotEmpty())
                         <div class="d-flex gap-2 mb-2">
                             @foreach($review->images as $revImg)
-                                <img src="{{ asset('storage/' . $revImg->image_url) }}" alt="Ảnh đánh giá" class="rounded-3 border object-fit-cover" style="width: 65px; height: 65px;">
+                                <img src="{{ $revImg->display_url }}" alt="Ảnh đánh giá" class="rounded-3 border object-fit-cover" style="width: 65px; height: 65px;">
                             @endforeach
                         </div>
                     @endif
@@ -641,7 +641,7 @@
                 <button type="button" class="btn btn-dark btn-sm rounded-circle position-absolute top-0 end-0 m-3 shadow z-3" data-bs-dismiss="modal" aria-label="Close" style="width: 38px; height: 38px;">
                     <i class="fa-solid fa-xmark fs-6"></i>
                 </button>
-                <img id="lightbox-main-img" src="{{ $thumbnail && $thumbnail->image_url ? asset('storage/' . $thumbnail->image_url) : '' }}" class="img-fluid rounded-4 shadow-lg bg-white" style="max-height: 85vh; width: auto;" alt="{{ $product->name }}">
+                <img id="lightbox-main-img" src="{{ $thumbnail ? $thumbnail->display_url : $product->image_url }}" class="img-fluid rounded-4 shadow-lg bg-white" style="max-height: 85vh; width: auto;" alt="{{ $product->name }}">
             </div>
         </div>
     </div>
@@ -656,7 +656,7 @@
             {
                 id: {{ $img->id }},
                 color_id: {{ $img->color_id ? $img->color_id : 'null' }},
-                url: "{{ asset('storage/' . $img->image_url) }}",
+                url: "{{ $img->display_url }}",
                 is_thumbnail: {{ $img->is_thumbnail ? 'true' : 'false' }}
             },
         @endforeach

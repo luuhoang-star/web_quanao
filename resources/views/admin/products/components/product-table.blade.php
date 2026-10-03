@@ -59,8 +59,8 @@
                         @endphp
                         <tr>
                             <td class="ps-3">
-                                @if($thumb && $thumb->image_url)
-                                    <img src="{{ asset('storage/' . $thumb->image_url) }}" alt="{{ $product->name }}" class="rounded-3 border object-fit-cover" style="width: 48px; height: 48px;">
+                                @if($thumb)
+                                    <img src="{{ $thumb->display_url }}" alt="{{ $product->name }}" class="rounded-3 border object-fit-cover" style="width: 48px; height: 48px;">
                                 @else
                                     <div class="bg-light border rounded-3 d-flex align-items-center justify-content-center text-muted" style="width: 48px; height: 48px;">
                                         <i class="fa-solid fa-image text-secondary"></i>

@@ -230,11 +230,11 @@
                                 $bankName = $siteSettings['bank_name'] ?? 'Vietcombank';
                                 $bankAccount = $siteSettings['bank_account'] ?? '9973797151';
                                 $bankAccountName = $siteSettings['bank_account_name'] ?? 'LUU VAN HOANG';
-                                $bankSyntax = $siteSettings['bank_transfer_syntax'] ?? 'TT';
-                                $momoPhone = $siteSettings['momo_phone'] ?? '0973797151';
-                                $momoName = $siteSettings['momo_name'] ?? 'LUU VAN HOANG';
-                                $bankTransferContent = $bankSyntax . ' ' . ($user->phone ?? 'STORE');
-                                $vietQrUrl = "https://img.vietqr.io/image/{$bankCode}-{$bankAccount}-compact2.png?amount={$totalAmount}&addInfo=" . urlencode($bankTransferContent) . "&accountName=" . urlencode($bankAccountName);
+                                $bankSyntax = trim($siteSettings['bank_transfer_syntax'] ?? 'TT');
+                                $momoPhone = trim($siteSettings['momo_phone'] ?? '0973797151');
+                                $momoName = trim($siteSettings['momo_name'] ?? 'LUU VAN HOANG');
+                                $bankTransferContent = ($bankSyntax ?: 'TT').' '.($user->phone ?? 'STORE');
+                                $vietQrUrl = "https://img.vietqr.io/image/{$bankCode}-{$bankAccount}-compact2.png?amount={$totalAmount}&addInfo=".urlencode($bankTransferContent).'&accountName='.urlencode($bankAccountName);
                                 $momoQrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" . urlencode("2|99|{$momoPhone}|{$momoName}|store@atino.vn|0|0|{$totalAmount}");
                             @endphp
                             <div id="details-atm" class="payment-expand-container mt-3 d-none">
@@ -305,6 +305,9 @@
                         </div>
 
                         <!-- Option 3: Ví Điện Tử MoMo -->
+                        @php
+                            $momoMode = $siteSettings['momo_mode'] ?? 'personal';
+                        @endphp
                         <div class="payment-card-option" id="card_momo" onclick="selectPaymentOption('momo')">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div class="d-flex align-items-center gap-3">
@@ -314,67 +317,100 @@
                                     </div>
                                     <div>
                                         <label class="fw-bold text-dark mb-0 d-block cursor-pointer" for="payment_momo">
-                                            Thanh toán Ví MoMo (MoMo QR)
+                                            {{ $momoMode === 'gateway' ? 'Cổng thanh toán Ví MoMo (MoMo Gateway)' : 'Thanh toán Ví MoMo (Quét mã MoMo QR)' }}
                                         </label>
-                                        <span class="extra-small text-muted">Thanh toán bảo mật tức thì qua ứng dụng ví điện tử MoMo</span>
-                                    </div>
-                                </div>
-                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle extra-small fw-bold px-2.5 py-1 rounded-pill">Ví MoMo</span>
-                            </div>
-                            <div id="details-momo" class="payment-expand-container mt-3 d-none">
-                                <div class="row align-items-center g-4">
-                                    <div class="col-md-7">
-                                        <div class="p-3 bg-light rounded-3 border">
-                                            <div class="mb-2 pb-2 border-bottom">
-                                                <span class="extra-small text-muted d-block">Số điện thoại MoMo:</span>
-                                                <div class="d-flex align-items-center justify-content-between mt-0.5">
-                                                    <span class="badge bg-danger fs-6 px-2.5 py-1 font-monospace">{{ $momoPhone }}</span>
-                                                    <button type="button" class="copy-btn-action" onclick="copyToClipboard('{{ $momoPhone }}', 'Đã copy Số điện thoại MoMo!')">
-                                                        <i class="fa-regular fa-copy"></i> Copy
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="mb-2 pb-2 border-bottom">
-                                                <span class="extra-small text-muted d-block">Tên người nhận:</span>
-                                                <strong class="text-dark small text-uppercase">{{ $momoName }}</strong>
-                                            </div>
-                                            <div class="mb-2 pb-2 border-bottom">
-                                                <span class="extra-small text-muted d-block">Số tiền thanh toán:</span>
-                                                <strong class="text-danger fs-6">{{ number_format($totalAmount) }}đ</strong>
-                                            </div>
-                                            <div>
-                                                <span class="extra-small text-muted d-block">Lời nhắn MoMo:</span>
-                                                <div class="d-flex align-items-center justify-content-between mt-0.5">
-                                                    <strong class="text-danger small font-monospace">{{ $bankTransferContent }}</strong>
-                                                    <button type="button" class="copy-btn-action" onclick="copyToClipboard('{{ $bankTransferContent }}', 'Đã copy Lời nhắn MoMo!')">
-                                                        <i class="fa-regular fa-copy"></i> Copy
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-5 text-center">
-                                        <div class="p-2 bg-white rounded-3 border shadow-sm d-inline-block">
-                                            <img src="{{ $momoQrUrl }}" 
-                                                 alt="MoMo QR Code" 
-                                                 class="img-fluid rounded-2" 
-                                                 style="max-height: 160px;">
-                                        </div>
-                                        <span class="d-block extra-small text-muted mt-1.5 fw-semibold">
-                                            <i class="fa-solid fa-qrcode me-1 text-danger"></i>Quét mã QR bằng App MoMo
+                                        <span class="extra-small text-muted">
+                                            {{ $momoMode === 'gateway' ? 'Thanh toán bảo mật tức thì qua Cổng MoMo (App MoMo, ATM & Thẻ Quốc tế)' : 'Quét mã chuyển tiền nhanh qua ứng dụng MoMo - Tự động duyệt đơn' }}
                                         </span>
                                     </div>
                                 </div>
+                                <span class="badge {{ $momoMode === 'gateway' ? 'bg-danger text-white' : 'bg-danger-subtle text-danger border border-danger-subtle' }} extra-small fw-bold px-2.5 py-1 rounded-pill">
+                                    {{ $momoMode === 'gateway' ? 'MoMo Gateway' : 'Ví MoMo' }}
+                                </span>
                             </div>
-                        </div>
-
-                                    <div class="col-12 mt-2">
-                                        <div class="alert alert-danger py-2 px-3 mb-0 rounded-3 border-danger-subtle extra-small d-flex align-items-center gap-2">
-                                            <i class="fa-solid fa-circle-info text-danger fs-6"></i>
-                                            <span><strong>Quy định giao hàng:</strong> Đơn hàng sẽ được nhân viên xác nhận và xuất kho đi giao ngay sau khi quý khách hoàn tất chuyển tiền qua ví MoMo.</span>
+                            <div id="details-momo" class="payment-expand-container mt-3 d-none">
+                                @if($momoMode === 'gateway')
+                                    <div class="p-3 bg-danger-subtle rounded-3 border border-danger-subtle">
+                                        <div class="d-flex align-items-center gap-2 mb-2 text-danger fw-bold small">
+                                            <i class="fa-solid fa-bolt"></i>
+                                            <span>Xử lý tự động & Kích hoạt đơn ngay lập tức:</span>
+                                        </div>
+                                        <ul class="extra-small text-dark ps-3 mb-2">
+                                            <li class="mb-1">Sau khi bấm <strong>"Hoàn Tất Đặt Hàng"</strong>, hệ thống sẽ tự động chuyển hướng bạn đến <strong>Cổng thanh toán bảo mật MoMo</strong>.</li>
+                                            <li class="mb-1">Hỗ trợ quét mã QR bằng ứng dụng MoMo trên điện thoại hoặc đăng nhập ví MoMo.</li>
+                                            <li>Đơn hàng sẽ được tự động duyệt và xác nhận ngay sau khi giao dịch thành công.</li>
+                                        </ul>
+                                        <div class="d-flex align-items-center gap-2 text-muted extra-small">
+                                            <i class="fa-solid fa-shield-halved text-success"></i>
+                                            <span>Giao dịch được mã hóa và bảo mật chuẩn quốc tế PCI DSS của MoMo.</span>
                                         </div>
                                     </div>
-                                </div>
+                                @else
+                                    <div class="p-3 bg-danger-subtle rounded-3 border border-danger-subtle">
+                                        <div class="row align-items-center g-4">
+                                            <div class="col-md-7">
+                                                <div class="p-3 bg-white rounded-3 border">
+                                                    <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom border-danger-subtle">
+                                                        <span class="extra-small text-danger fw-bold text-uppercase"><i class="fa-solid fa-wallet me-1"></i>Ví MoMo Thụ Hưởng</span>
+                                                        <span class="badge extra-small fw-bold text-white px-2 py-0.5" style="background-color: #a50064;">MoMo Pay</span>
+                                                    </div>
+
+                                                    <!-- Số điện thoại MoMo -->
+                                                    <div class="mb-2 pb-2 border-bottom">
+                                                        <span class="extra-small text-muted d-block">Số điện thoại Ví MoMo:</span>
+                                                        <div class="d-flex align-items-center justify-content-between mt-0.5">
+                                                            <span class="bank-info-badge font-monospace text-danger fs-6">{{ $momoPhone }}</span>
+                                                            <button type="button" class="copy-btn-action" onclick="copyToClipboard('{{ $momoPhone }}', 'Đã copy Số điện thoại MoMo!')">
+                                                                <i class="fa-regular fa-copy"></i> Copy SĐT
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Chủ tài khoản -->
+                                                    <div class="mb-2 pb-2 border-bottom">
+                                                        <span class="extra-small text-muted d-block">Chủ ví MoMo / Tài khoản:</span>
+                                                        <strong class="text-dark small text-uppercase">{{ $momoName }}</strong>
+                                                    </div>
+
+                                                    <!-- Số tiền thanh toán -->
+                                                    <div class="mb-2 pb-2 border-bottom">
+                                                        <span class="extra-small text-muted d-block">Số tiền thanh toán:</span>
+                                                        <strong class="text-danger fs-6">{{ number_format($totalAmount) }}đ</strong>
+                                                    </div>
+
+                                                    <!-- Hướng dẫn thao tác -->
+                                                    <div class="extra-small text-muted">
+                                                        <i class="fa-solid fa-mobile-screen text-danger me-1"></i>Mở <strong>App MoMo</strong> &rarr; Chọn <strong>"Quét mã"</strong> &rarr; Hướng camera vào mã QR bên cạnh để chuyển tiền tự động.
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-5 text-center">
+                                                <div class="p-2 bg-white rounded-3 border shadow-sm d-inline-block position-relative" style="border-color: #f4c1dc !important;">
+                                                    <img src="{{ $vietQrUrl }}" 
+                                                         alt="Mã QR Quét Bằng MoMo" 
+                                                         class="img-fluid rounded-2" 
+                                                         style="max-height: 210px; width: auto;">
+                                                </div>
+                                                <div class="mt-2">
+                                                    <span class="badge text-white extra-small px-2 py-1 rounded-pill" style="background-color: #a50064;">
+                                                        <i class="fa-solid fa-qrcode me-1"></i>Quét bằng App MoMo 24/7
+                                                    </span>
+                                                </div>
+                                                <span class="d-block extra-small text-muted mt-1 fw-semibold">
+                                                    Tự động điền số tiền & thông tin
+                                                </span>
+                                            </div>
+
+                                            <div class="col-12 mt-2">
+                                                <div class="alert alert-danger py-2 px-3 mb-0 rounded-3 border-danger-subtle extra-small d-flex align-items-center gap-2" style="background-color: #fdf2f7;">
+                                                    <i class="fa-solid fa-bolt text-danger fs-6"></i>
+                                                    <span><strong>Tự Động Duyệt Đơn:</strong> Sau khi bấm <strong>"Hoàn Tất Đặt Hàng"</strong>, hệ thống sẽ cấp mã đơn <code>ORD-...</code> và <strong>tự động chuyển trạng thái đơn hàng sang "Đã Thanh Toán" ngay khi bạn quét tiền thành công</strong>.</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -410,8 +446,8 @@
                                 @endphp
                                 <div class="d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom border-light">
                                     <div class="d-flex align-items-center gap-3">
-                                        @if($thumb && $thumb->image_url)
-                                            <img src="{{ asset('storage/' . $thumb->image_url) }}" alt="{{ $product->name }}" class="rounded-3 border object-fit-cover flex-shrink-0" style="width: 52px; height: 52px;">
+                                        @if($thumb)
+                                            <img src="{{ $thumb->display_url }}" alt="{{ $product->name }}" class="rounded-3 border object-fit-cover flex-shrink-0" style="width: 52px; height: 52px;">
                                         @else
                                             <div class="bg-light border rounded-3 d-flex align-items-center justify-content-center text-muted flex-shrink-0" style="width: 52px; height: 52px;">
                                                 <i class="fa-solid fa-shirt"></i>

@@ -204,12 +204,8 @@
         'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=800&q=80',
     ];
 
-    $getProductImage = function($product) use ($realFashionPhotos) {
-        $photoFallback = $realFashionPhotos[$product->id % count($realFashionPhotos)];
-        if ($product->images->isNotEmpty() && $product->images->first()->image_path) {
-            return asset('storage/' . $product->images->first()->image_path);
-        }
-        return $photoFallback;
+    $getProductImage = function($product) {
+        return $product->image_url;
     };
 @endphp
 
@@ -248,110 +244,172 @@
         </div>
     </section>
 
-    {{-- ================= 2. FLASH SALE BANNER & PRODUCT LIST ================= --}}
+    {{-- ================= 2. FLASH SALE BOX (KHỐI SALE TẬP TRUNG) ================= --}}
     @if(!empty($siteSettings['home_show_flash_sale']))
     <section class="mb-5">
-        <div class="rounded-4 p-3.5 p-md-4 text-white mb-4 shadow-sm bg-dark d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 border border-dark">
-            <div class="d-flex align-items-center gap-3">
-                <span class="badge bg-danger text-white fw-bold px-3 py-2 rounded-pill fs-6">
-                    <i class="fa-solid fa-bolt me-1"></i> {{ $siteSettings['home_flash_sale_badge'] ?? 'FLASH SALE' }}
-                </span>
-                <div>
-                    <h5 class="fw-extrabold text-white mb-0 fs-5">{{ $siteSettings['home_flash_sale_title'] ?? 'Ưu Đãi Đặc Biệt - Săn Sale Giá Sốc' }}</h5>
-                    <span class="text-white-50 extra-small">{{ $siteSettings['home_flash_sale_subtitle'] ?? 'Số lượng có hạn, nhanh tay sở hữu!' }}</span>
+        <div class="p-3.5 p-md-4 rounded-4 shadow-sm" style="background: linear-gradient(180deg, #fff7f7 0%, #ffffff 100%); border: 1.5px solid #fed7d7;">
+            {{-- Header Flash Sale --}}
+            <div class="rounded-4 p-3.5 p-md-4 text-white mb-4 shadow-sm bg-dark d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-danger text-white fw-bold px-3 py-2 rounded-pill fs-6 shadow-xs">
+                        <i class="fa-solid fa-bolt me-1"></i> {{ $siteSettings['home_flash_sale_badge'] ?? 'FLASH SALE' }}
+                    </span>
+                    <div>
+                        <h5 class="fw-extrabold text-white mb-0 fs-5">{{ $siteSettings['home_flash_sale_title'] ?? 'Ưu Đãi Đặc Biệt - Săn Sale Giá Sốc' }}</h5>
+                        <span class="text-white-50 extra-small">{{ $siteSettings['home_flash_sale_subtitle'] ?? 'Số lượng có hạn, nhanh tay sở hữu!' }}</span>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-3">
+                    {{-- Dynamic Countdown Timer --}}
+                    <div class="d-flex align-items-center gap-1.5 fs-6 fw-bold">
+                        <span class="bg-white text-dark rounded px-2 py-1 shadow-xs" id="flash-hours">00h</span> :
+                        <span class="bg-white text-dark rounded px-2 py-1 shadow-xs" id="flash-minutes">00m</span> :
+                        <span class="bg-white text-dark rounded px-2 py-1 shadow-xs" id="flash-seconds">00s</span>
+                    </div>
+                    <a href="{{ route('shop.flashSale') }}" class="btn btn-light btn-sm rounded-pill fw-bold px-3 py-2 text-dark shadow-xs">
+                        Xem tất cả <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
                 </div>
             </div>
 
-            <div class="d-flex align-items-center gap-3">
-                {{-- Dynamic Countdown Timer --}}
-                <div class="d-flex align-items-center gap-1.5 fs-6 fw-bold">
-                    <span class="bg-white text-dark rounded px-2 py-1" id="flash-hours">00h</span> :
-                    <span class="bg-white text-dark rounded px-2 py-1" id="flash-minutes">00m</span> :
-                    <span class="bg-white text-dark rounded px-2 py-1" id="flash-seconds">00s</span>
-                </div>
-                <a href="{{ route('shop.flashSale') }}" class="btn btn-light btn-sm rounded-pill fw-bold px-3 py-2 text-dark">
-                    Xem tất cả <i class="fa-solid fa-arrow-right ms-1"></i>
-                </a>
-            </div>
-        </div>
-
-        @if(isset($flashSaleItems) && $flashSaleItems->count() > 0)
-            <div class="row g-3 g-md-4">
-                @foreach($flashSaleItems as $flashSale)
+            @if(isset($flashSaleItems) && $flashSaleItems->count() > 0)
+                @if($flashSaleItems->count() === 1)
+                    {{-- Trường hợp chỉ có 1 sản phẩm Flash Sale: Hiển thị dạng Deal Hot Hero Card --}}
                     @php
-                        $product = $flashSale->product;
-                        if (!$product || !$product->is_active) continue;
-                        $percent = $flashSale->discount_percent;
-                        $remaining = $flashSale->remaining_quantity;
+                        $singleFlash = $flashSaleItems->first();
+                        $product = $singleFlash->product;
+                        $percent = $singleFlash->discount_percent;
+                        $remaining = $singleFlash->remaining_quantity;
                         $fallbackPhoto = $realFashionPhotos[$product->id % count($realFashionPhotos)];
                         $imgSrc = $getProductImage($product);
                     @endphp
-                    <div class="col-6 col-md-3 flash-sale-card-item">
-                        <div class="card atino-product-card h-100 p-2.5 border shadow-sm">
-                            <div class="position-relative">
-                                <a href="{{ route('shop.show', $product->slug) }}" class="d-block text-decoration-none">
-                                    <div class="atino-img-container">
-                                        @if($percent > 0)
-                                            <span class="badge-discount-red">-{{ $percent }}%</span>
-                                        @endif
-                                        <img src="{{ $imgSrc }}" alt="{{ $product->name }}" style="height: 280px; object-fit: cover;" onerror="this.onerror=null; this.src='{{ $fallbackPhoto }}';">
+                    <div class="row justify-content-center my-2">
+                        <div class="col-lg-8 col-xl-7">
+                            <div class="card border-0 rounded-4 shadow-sm overflow-hidden bg-white p-3.5 p-md-4">
+                                <div class="row g-4 align-items-center">
+                                    <div class="col-md-5">
+                                        <div class="position-relative atino-img-container rounded-3 overflow-hidden shadow-xs">
+                                            @if($percent > 0)
+                                                <span class="badge-discount-red">-{{ $percent }}%</span>
+                                            @endif
+                                            <a href="{{ route('shop.show', $product->slug) }}">
+                                                <img src="{{ $imgSrc }}" alt="{{ $product->name }}" class="w-100 rounded-3" style="height: 270px; object-fit: cover;" onerror="this.onerror=null; this.src='{{ $fallbackPhoto }}';">
+                                            </a>
+                                        </div>
                                     </div>
-                                </a>
-                                <button type="button" class="btn btn-light btn-sm rounded-circle position-absolute top-0 end-0 m-2 shadow-sm z-2 btn-toggle-wishlist d-flex align-items-center justify-content-center" data-id="{{ $product->id }}" title="Thêm vào yêu thích" style="width: 34px; height: 34px;">
-                                    <i class="{{ (Auth::check() && Auth::user()->wishlists && Auth::user()->wishlists->contains('product_id', $product->id)) ? 'fa-solid fa-heart text-danger' : 'fa-regular fa-heart text-muted' }}"></i>
-                                </button>
-                            </div>
-
-                            <div class="pt-3 px-1 d-flex flex-column justify-content-between flex-grow-1">
-                                <div>
-                                    <span class="extra-small text-muted text-uppercase fw-semibold" style="font-size: 0.65rem;">
-                                        {{ $product->category->name ?? 'Thời trang Atino' }}
-                                    </span>
-                                    <h6 class="card-title text-dark fw-bold small mb-1 text-truncate" title="{{ $product->name }}">
-                                        <a href="{{ route('shop.show', $product->slug) }}" class="text-dark text-decoration-none">
-                                            {{ $product->name }}
-                                        </a>
-                                    </h6>
-                                    
-                                    <div class="small text-danger fw-semibold mb-2 d-flex align-items-center gap-1" style="font-size: 0.725rem;">
-                                        <i class="fa-solid fa-fire text-danger"></i>
-                                        <span>Còn lại: <strong>{{ $remaining }}</strong> sản phẩm</span>
+                                    <div class="col-md-7">
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle extra-small fw-bold px-2.5 py-1 rounded-pill mb-2">
+                                            <i class="fa-solid fa-fire me-1"></i> SẢN PHẨM FLASH SALE HÔM NAY
+                                        </span>
+                                        <h5 class="fw-bold text-dark mb-2">
+                                            <a href="{{ route('shop.show', $product->slug) }}" class="text-dark text-decoration-none hover-text-danger">
+                                                {{ $product->name }}
+                                            </a>
+                                        </h5>
+                                        <div class="d-flex align-items-baseline gap-2 mb-3">
+                                            <span class="fw-extrabold text-danger fs-4">{{ number_format($singleFlash->sale_price) }}đ</span>
+                                            <del class="text-muted small">{{ number_format($product->price) }}đ</del>
+                                        </div>
+                                        <div class="p-2.5 bg-danger-subtle rounded-3 mb-3 extra-small text-danger fw-semibold d-flex align-items-center gap-2">
+                                            <i class="fa-solid fa-bolt fs-6"></i>
+                                            <span>Chỉ còn lại <strong>{{ $remaining }}</strong> sản phẩm giá ưu đãi!</span>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <button type="button" class="btn btn-dark btn-md rounded-pill fw-bold px-4 shadow-sm btn-add-to-cart flex-grow-1" data-id="{{ $product->id }}">
+                                                <i class="fa-solid fa-bag-shopping me-2"></i> Thêm vào giỏ
+                                            </button>
+                                            <a href="{{ route('shop.show', $product->slug) }}" class="btn btn-outline-dark btn-md rounded-pill px-3 fw-bold">
+                                                Chi tiết
+                                            </a>
+                                        </div>
                                     </div>
-                                </div>
-
-                                <div class="pt-2 border-top border-light">
-                                    <div class="d-flex align-items-baseline gap-2 mb-2">
-                                        <span class="fw-extrabold text-danger fs-5 me-1">{{ number_format($flashSale->sale_price) }}đ</span>
-                                        <del class="extra-small text-muted" style="font-size: 0.75rem;">{{ number_format($product->price) }}đ</del>
-                                    </div>
-                                    <button type="button" class="btn btn-dark btn-sm w-100 rounded-pill fw-bold shadow-sm btn-add-to-cart py-2" data-id="{{ $product->id }}">
-                                        <i class="fa-solid fa-bag-shopping me-1"></i> Thêm vào giỏ
-                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                @endforeach
-            </div>
+                @else
+                    {{-- Trường hợp có từ 2 sản phẩm Flash Sale trở lên: Hiển thị Grid chuẩn --}}
+                    <div class="row g-3 g-md-4">
+                        @foreach($flashSaleItems as $flashSale)
+                            @php
+                                $product = $flashSale->product;
+                                if (!$product || !$product->is_active) continue;
+                                $percent = $flashSale->discount_percent;
+                                $remaining = $flashSale->remaining_quantity;
+                                $fallbackPhoto = $realFashionPhotos[$product->id % count($realFashionPhotos)];
+                                $imgSrc = $getProductImage($product);
+                            @endphp
+                            <div class="col-6 col-md-3 flash-sale-card-item">
+                                <div class="card atino-product-card h-100 p-2.5 border shadow-sm bg-white">
+                                    <div class="position-relative">
+                                        <a href="{{ route('shop.show', $product->slug) }}" class="d-block text-decoration-none">
+                                            <div class="atino-img-container">
+                                                @if($percent > 0)
+                                                    <span class="badge-discount-red">-{{ $percent }}%</span>
+                                                @endif
+                                                <img src="{{ $imgSrc }}" alt="{{ $product->name }}" style="height: 280px; object-fit: cover;" onerror="this.onerror=null; this.src='{{ $fallbackPhoto }}';">
+                                            </div>
+                                        </a>
+                                        <button type="button" class="btn btn-light btn-sm rounded-circle position-absolute top-0 end-0 m-2 shadow-sm z-2 btn-toggle-wishlist d-flex align-items-center justify-content-center" data-id="{{ $product->id }}" title="Thêm vào yêu thích" style="width: 34px; height: 34px;">
+                                            <i class="{{ (Auth::check() && Auth::user()->wishlists && Auth::user()->wishlists->contains('product_id', $product->id)) ? 'fa-solid fa-heart text-danger' : 'fa-regular fa-heart text-muted' }}"></i>
+                                        </button>
+                                    </div>
 
-            {{-- Flash Sale Pagination Controls (< 1/2 >) --}}
-            <div class="d-flex align-items-center justify-content-center gap-3 mt-4" id="flash-pagination-container">
-                <button type="button" class="btn btn-light rounded-circle shadow-sm border p-0 d-inline-flex align-items-center justify-content-center" id="btn-flash-prev" style="width: 40px; height: 40px;" title="Trang trước">
-                    <i class="fa-solid fa-chevron-left text-dark small"></i>
-                </button>
-                
-                <span class="fw-bold text-dark fs-6 px-2" id="flash-page-indicator">1/2</span>
-                
-                <button type="button" class="btn btn-light rounded-circle shadow-sm border p-0 d-inline-flex align-items-center justify-content-center" id="btn-flash-next" style="width: 40px; height: 40px;" title="Trang tiếp">
-                    <i class="fa-solid fa-chevron-right text-dark small"></i>
-                </button>
-            </div>
-        @else
-            <div class="text-center py-4 bg-light rounded-4 border">
-                <i class="fa-solid fa-clock text-muted fs-3 mb-2"></i>
-                <p class="mb-0 text-muted fw-semibold">Hiện chưa có sản phẩm nào trong chương trình Flash Sale.</p>
-            </div>
-        @endif
+                                    <div class="pt-3 px-1 d-flex flex-column justify-content-between flex-grow-1">
+                                        <div>
+                                            <span class="extra-small text-muted text-uppercase fw-semibold" style="font-size: 0.65rem;">
+                                                {{ $product->category->name ?? 'Thời trang Atino' }}
+                                            </span>
+                                            <h6 class="card-title text-dark fw-bold small mb-1 text-truncate" title="{{ $product->name }}">
+                                                <a href="{{ route('shop.show', $product->slug) }}" class="text-dark text-decoration-none">
+                                                    {{ $product->name }}
+                                                </a>
+                                            </h6>
+                                            
+                                            <div class="small text-danger fw-semibold mb-2 d-flex align-items-center gap-1" style="font-size: 0.725rem;">
+                                                <i class="fa-solid fa-fire text-danger"></i>
+                                                <span>Còn lại: <strong>{{ $remaining }}</strong> sản phẩm</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="pt-2 border-top border-light">
+                                            <div class="d-flex align-items-baseline gap-2 mb-2">
+                                                <span class="fw-extrabold text-danger fs-5 me-1">{{ number_format($flashSale->sale_price) }}đ</span>
+                                                <del class="extra-small text-muted" style="font-size: 0.75rem;">{{ number_format($product->price) }}đ</del>
+                                            </div>
+                                            <button type="button" class="btn btn-dark btn-sm w-100 rounded-pill fw-bold shadow-sm btn-add-to-cart py-2" data-id="{{ $product->id }}">
+                                                <i class="fa-solid fa-bag-shopping me-1"></i> Thêm vào giỏ
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- Phân trang Flash Sale chỉ hiển thị khi có trên 4 sản phẩm --}}
+                    @if($flashSaleItems->count() > 4)
+                        <div class="d-flex align-items-center justify-content-center gap-3 mt-4" id="flash-pagination-container">
+                            <button type="button" class="btn btn-light rounded-circle shadow-sm border p-0 d-inline-flex align-items-center justify-content-center" id="btn-flash-prev" style="width: 40px; height: 40px;" title="Trang trước">
+                                <i class="fa-solid fa-chevron-left text-dark small"></i>
+                            </button>
+                            
+                            <span class="fw-bold text-dark fs-6 px-2" id="flash-page-indicator">1/2</span>
+                            
+                            <button type="button" class="btn btn-light rounded-circle shadow-sm border p-0 d-inline-flex align-items-center justify-content-center" id="btn-flash-next" style="width: 40px; height: 40px;" title="Trang tiếp">
+                                <i class="fa-solid fa-chevron-right text-dark small"></i>
+                            </button>
+                        </div>
+                    @endif
+                @endif
+            @else
+                <div class="text-center py-4 bg-white rounded-4 border">
+                    <i class="fa-solid fa-clock text-muted fs-3 mb-2"></i>
+                    <p class="mb-0 text-muted fw-semibold">Hiện chưa có sản phẩm nào trong chương trình Flash Sale.</p>
+                </div>
+            @endif
+        </div>
     </section>
     @endif
 
@@ -473,36 +531,48 @@
 
     {{-- ================= 4. OUTFIT PHỐI SẴN GỢI Ý ================= --}}
     <section class="mb-5">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-            <h4 class="fw-extrabold text-dark mb-0" style="letter-spacing: -0.02em;">OUTFIT PHỐI SẴN GỢI Ý</h4>
-            <a href="{{ route('shop.index') }}" class="text-secondary small text-decoration-none fw-semibold">Xem tất cả <i class="fa-solid fa-arrow-right ms-1"></i></a>
-        </div>
+        <div class="p-4 p-md-4 rounded-4 shadow-sm" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-2">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="badge bg-dark text-white rounded-pill px-2.5 py-1 extra-small fw-bold">
+                            <i class="fa-solid fa-shirt me-1"></i> MIX & MATCH
+                        </span>
+                        <h4 class="fw-extrabold text-dark mb-0" style="letter-spacing: -0.02em;">OUTFIT PHỐI SẴN GỢI Ý</h4>
+                    </div>
+                    <p class="text-muted extra-small mb-0">Các bộ trang phục được stylist Atino gợi ý phối theo từng phong cách và dịp sử dụng.</p>
+                </div>
+                <a href="{{ route('shop.index') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold align-self-start align-self-md-auto shadow-xs">
+                    Xem tất cả outfit <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
 
-        <div class="row g-3">
-            @forelse($outfits ?? [] as $outfitItem)
-                <div class="col-md-4 col-lg-3">
-                    <div class="card border-0 rounded-4 overflow-hidden shadow-sm h-100 position-relative" style="background: url('{{ $outfitItem->hero_image_url }}') center/cover no-repeat; min-height: 240px;">
-                        <div class="p-3.5 d-flex flex-column justify-content-between h-100 text-white" style="background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(15,23,42,0.85) 100%); min-height: 240px;">
-                            <span class="badge bg-dark text-white rounded-pill px-2.5 py-1.5 extra-small align-self-start border border-secondary shadow-sm">
-                                {{ $outfitItem->badge ?: 'OUTFIT' }}
-                            </span>
-                            <div>
-                                <h6 class="fw-bold text-white mb-1">{{ $outfitItem->name }}</h6>
-                                @if($outfitItem->tagline)
-                                    <span class="text-white-50 extra-small d-block mb-2 text-truncate">{{ $outfitItem->tagline }}</span>
-                                @endif
-                                <a href="{{ route('outfits.show', $outfitItem->slug) }}" class="btn btn-light btn-sm rounded-pill w-100 fw-bold text-dark mt-1" style="font-size: 0.775rem;">
-                                    Xem Outfit <i class="fa-solid fa-arrow-right ms-1"></i>
-                                </a>
+            <div class="row g-3">
+                @forelse($outfits ?? [] as $outfitItem)
+                    <div class="col-md-4 col-lg-3">
+                        <div class="card border-0 rounded-4 overflow-hidden shadow-sm h-100 position-relative" style="background: url('{{ $outfitItem->hero_image_url }}') center/cover no-repeat; min-height: 250px;">
+                            <div class="p-3.5 d-flex flex-column justify-content-between h-100 text-white" style="background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(15,23,42,0.85) 100%); min-height: 250px;">
+                                <span class="badge bg-dark text-white rounded-pill px-2.5 py-1.5 extra-small align-self-start border border-secondary shadow-sm">
+                                    {{ $outfitItem->badge ?: 'OUTFIT' }}
+                                </span>
+                                <div>
+                                    <h6 class="fw-bold text-white mb-1">{{ $outfitItem->name }}</h6>
+                                    @if($outfitItem->tagline)
+                                        <span class="text-white-50 extra-small d-block mb-2 text-truncate">{{ $outfitItem->tagline }}</span>
+                                    @endif
+                                    <a href="{{ route('outfits.show', $outfitItem->slug) }}" class="btn btn-light btn-sm rounded-pill w-100 fw-bold text-dark mt-1 shadow-xs" style="font-size: 0.775rem;">
+                                        Xem Chi Tiết Outfit <i class="fa-solid fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            @empty
-                <div class="col-12 text-center text-muted py-4 bg-light rounded-4 border">
-                    <p class="mb-0">Đang cập nhật các bộ outfit phối sẵn mới nhất...</p>
-                </div>
-            @endforelse
+                @empty
+                    <div class="col-12 text-center text-muted py-4 bg-white rounded-4 border">
+                        <p class="mb-0">Đang cập nhật các bộ outfit phối sẵn mới nhất...</p>
+                    </div>
+                @endforelse
+            </div>
         </div>
     </section>
 
@@ -549,71 +619,73 @@
 
     {{-- ================= 6. CUSTOMER REVIEWS SECTION ================= --}}
     <section class="mb-5">
-        <div class="text-center mb-4">
-            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-bold extra-small text-uppercase mb-2">ĐÁNH GIÁ THỰC TẾ</span>
-            <h2 class="fw-extrabold text-dark mb-1" style="letter-spacing: -0.03em; font-size: 2rem;">KHÁCH HÀNG NÓI VỀ ATINO</h2>
-            <p class="text-muted small">Hơn 50,000+ khách hàng đã tin tưởng và hài lòng với chất lượng Atino.</p>
-        </div>
+        <div class="p-4 p-md-5 rounded-4 shadow-sm" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
+            <div class="text-center mb-4">
+                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-bold extra-small text-uppercase mb-2">ĐÁNH GIÁ THỰC TẾ</span>
+                <h2 class="fw-extrabold text-dark mb-1" style="letter-spacing: -0.03em; font-size: 2rem;">KHÁCH HÀNG NÓI VỀ ATINO</h2>
+                <p class="text-muted small mb-0">Hơn 50,000+ khách hàng đã tin tưởng và hài lòng với chất lượng Atino.</p>
+            </div>
 
-        <div class="row g-4" id="customer-reviews-row">
-            @forelse($customerReviews ?? [] as $rev)
-                @php
-                    $revUser = $rev->user;
-                    $userName = $revUser ? $revUser->name : 'Khách hàng Atino';
-                    $userAvatar = $revUser ? $revUser->avatar_url : 'https://ui-avatars.com/api/?name=' . urlencode($userName) . '&background=0f172a&color=ffffff&bold=true';
-                    $rating = $rev->rating ?: 5;
-                @endphp
-                <div class="col-md-4 customer-review-card-item">
-                    <div class="card h-100 border-0 rounded-4 p-4 shadow-sm bg-white d-flex flex-column justify-content-between">
-                        <div>
-                            <div class="d-flex align-items-center gap-3 mb-3">
-                                <img src="{{ $userAvatar }}" alt="{{ $userName }}" class="rounded-circle border" style="width: 48px; height: 48px; object-fit: cover;">
-                                <div>
-                                    <h6 class="fw-bold text-dark mb-0 text-truncate" style="max-width: 180px;">{{ $userName }}</h6>
-                                    <span class="extra-small text-success fw-semibold"><i class="fa-solid fa-circle-check me-1"></i>Đã mua hàng</span>
+            <div class="row g-4" id="customer-reviews-row">
+                @forelse($customerReviews ?? [] as $rev)
+                    @php
+                        $revUser = $rev->user;
+                        $userName = $revUser ? $revUser->name : 'Khách hàng Atino';
+                        $userAvatar = $revUser ? $revUser->avatar_url : 'https://ui-avatars.com/api/?name=' . urlencode($userName) . '&background=0f172a&color=ffffff&bold=true';
+                        $rating = $rev->rating ?: 5;
+                    @endphp
+                    <div class="col-md-4 customer-review-card-item">
+                        <div class="card h-100 border-0 rounded-4 p-4 shadow-sm bg-white d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <img src="{{ $userAvatar }}" alt="{{ $userName }}" class="rounded-circle border" style="width: 48px; height: 48px; object-fit: cover;">
+                                    <div>
+                                        <h6 class="fw-bold text-dark mb-0 text-truncate" style="max-width: 180px;">{{ $userName }}</h6>
+                                        <span class="extra-small text-success fw-semibold"><i class="fa-solid fa-circle-check me-1"></i>Đã mua hàng</span>
+                                    </div>
                                 </div>
-                            </div>
 
-                            {{-- Rating Stars --}}
-                            <div class="text-warning mb-2" style="font-size: 0.85rem;">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <i class="fa-solid fa-star {{ $i <= $rating ? 'text-warning' : 'text-muted opacity-25' }}"></i>
-                                @endfor
-                            </div>
-
-                            @if($rev->product)
-                                <div class="extra-small text-muted mb-2 text-truncate">
-                                    <i class="fa-solid fa-bag-shopping me-1"></i> {{ $rev->product->name }}
+                                {{-- Rating Stars --}}
+                                <div class="text-warning mb-2" style="font-size: 0.85rem;">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="fa-solid fa-star {{ $i <= $rating ? 'text-warning' : 'text-muted opacity-25' }}"></i>
+                                    @endfor
                                 </div>
-                            @endif
 
-                            <p class="small text-secondary mb-0 leading-relaxed">
-                                "{{ $rev->comment }}"
-                            </p>
+                                @if($rev->product)
+                                    <div class="extra-small text-muted mb-2 text-truncate">
+                                        <i class="fa-solid fa-bag-shopping me-1"></i> {{ $rev->product->name }}
+                                    </div>
+                                @endif
+
+                                <p class="small text-secondary mb-0 leading-relaxed">
+                                    "{{ $rev->comment }}"
+                                </p>
+                            </div>
                         </div>
                     </div>
-                </div>
-            @empty
-                <div class="col-12 text-center text-muted py-4 bg-white rounded-4 shadow-sm">
-                    <p class="mb-0">Chưa có đánh giá nào từ khách hàng.</p>
-                </div>
-            @endforelse
-        </div>
-
-        {{-- Reviews Slider Pagination Controls (< 1/2 >) --}}
-        @if(isset($customerReviews) && $customerReviews->count() > 3)
-            <div class="d-flex align-items-center justify-content-center gap-3 mt-4" id="review-pagination-container">
-                <button type="button" class="btn btn-light rounded-circle shadow-sm border p-0 d-inline-flex align-items-center justify-content-center" id="btn-review-prev" style="width: 42px; height: 42px;" title="Xem các đánh giá trước">
-                    <i class="fa-solid fa-chevron-left text-dark"></i>
-                </button>
-
-                <span class="fw-bold text-dark fs-6 px-2" id="review-page-indicator">1/2</span>
-
-                <button type="button" class="btn btn-light rounded-circle shadow-sm border p-0 d-inline-flex align-items-center justify-content-center" id="btn-review-next" style="width: 42px; height: 42px;" title="Xem tiếp các đánh giá khác">
-                    <i class="fa-solid fa-chevron-right text-dark"></i>
-                </button>
+                @empty
+                    <div class="col-12 text-center text-muted py-4 bg-white rounded-4 border">
+                        <p class="mb-0">Chưa có đánh giá nào từ khách hàng.</p>
+                    </div>
+                @endforelse
             </div>
-        @endif
+
+            {{-- Reviews Slider Pagination Controls (< 1/2 >) --}}
+            @if(isset($customerReviews) && $customerReviews->count() > 3)
+                <div class="d-flex align-items-center justify-content-center gap-3 mt-4" id="review-pagination-container">
+                    <button type="button" class="btn btn-light rounded-circle shadow-sm border p-0 d-inline-flex align-items-center justify-content-center" id="btn-review-prev" style="width: 42px; height: 42px;" title="Xem các đánh giá trước">
+                        <i class="fa-solid fa-chevron-left text-dark"></i>
+                    </button>
+
+                    <span class="fw-bold text-dark fs-6 px-2" id="review-page-indicator">1/2</span>
+
+                    <button type="button" class="btn btn-light rounded-circle shadow-sm border p-0 d-inline-flex align-items-center justify-content-center" id="btn-review-next" style="width: 42px; height: 42px;" title="Xem tiếp các đánh giá khác">
+                        <i class="fa-solid fa-chevron-right text-dark"></i>
+                    </button>
+                </div>
+            @endif
+        </div>
     </section>
 
     {{-- ================= 7. SECTION @ATINO_STYLE (Shoppable Lookbook Grid) ================= --}}
@@ -760,6 +832,12 @@
                 var total = $items.length;
                 var totalPages = Math.ceil(total / FLASH_PER_PAGE) || 1;
 
+                if (total <= FLASH_PER_PAGE) {
+                    $('#flash-pagination-container').hide();
+                } else {
+                    $('#flash-pagination-container').show();
+                }
+
                 if (flashPage > totalPages) flashPage = totalPages;
                 if (flashPage < 1) flashPage = 1;
 
@@ -774,7 +852,9 @@
                 $('#btn-flash-next').prop('disabled', flashPage >= totalPages).css('opacity', flashPage >= totalPages ? '0.4' : '1');
             }
 
-            renderFlash();
+            if ($('.flash-sale-card-item').length > 0) {
+                renderFlash();
+            }
 
             $('#btn-flash-prev').on('click', function() {
                 if (flashPage > 1) {

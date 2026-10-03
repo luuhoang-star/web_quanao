@@ -117,8 +117,8 @@
                                     <!-- Sản phẩm -->
                                     <td class="ps-4 py-3">
                                         <div class="d-flex align-items-center gap-3">
-                                            @if($thumb && $thumb->image_url)
-                                                <img src="{{ asset('storage/' . $thumb->image_url) }}" alt="{{ $product->name }}" class="rounded-3 border object-fit-cover flex-shrink-0" style="width: 68px; height: 68px;">
+                                            @if($thumb)
+                                                <img src="{{ $thumb->display_url }}" alt="{{ $product->name }}" class="rounded-3 border object-fit-cover flex-shrink-0" style="width: 68px; height: 68px;">
                                             @else
                                                 <div class="bg-light border rounded-3 d-flex align-items-center justify-content-center text-muted flex-shrink-0" style="width: 68px; height: 68px;">
                                                     <i class="fa-solid fa-shirt fa-lg opacity-30"></i>

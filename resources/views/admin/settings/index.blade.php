@@ -379,6 +379,103 @@
                     </div>
                 </div>
             </div>
+
+            <!-- CẤU HÌNH CỔNG THANH TOÁN MOMO GATEWAY (V2) -->
+            <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
+                <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
+                    <h6 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-wallet me-2 text-danger"></i>Cổng Thanh Toán Trực Tuyến MoMo Gateway (API v2)</h6>
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle extra-small fw-bold px-3 py-1.5 rounded-pill">MoMo Gateway Official</span>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-danger py-2.5 px-3 rounded-3 border-danger-subtle small mb-4 d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-shield-halved fs-5 text-danger"></i>
+                        <div>
+                            Tích hợp cổng thanh toán MoMo chính thức (All In One - captureWallet). Cho phép khách hàng chuyển hướng đến Cổng MoMo để quét mã QR hoặc mở App thanh toán. Sau khi thanh toán, hệ thống sẽ tự động cập nhật trạng thái đơn hàng qua Callback & IPN Webhook.
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <!-- Hình thức hoạt động MoMo -->
+                        <div class="col-12 mb-2">
+                            <label for="momo_mode" class="form-label font-weight-bold text-dark">
+                                <i class="fa-solid fa-sliders text-danger me-1"></i>Hình Thức Hoạt Động Của Ví MoMo Trên Website <span class="text-danger">*</span>
+                            </label>
+                            @php
+                                $selectedMode = old('momo_mode', $settings['momo_mode'] ?? 'personal');
+                            @endphp
+                            <select class="form-select fw-semibold" id="momo_mode" name="momo_mode">
+                                <option value="personal" {{ $selectedMode === 'personal' ? 'selected' : '' }}>
+                                    ★ [CÁCH 2 - DÙNG NGAY] Ví MoMo Cá Nhân Quét Mã QR (Nhận tiền thật về ví 0973797151 - Tự động duyệt đơn qua SePay)
+                                </option>
+                                <option value="gateway" {{ $selectedMode === 'gateway' ? 'selected' : '' }}>
+                                    Cổng Thanh Toán Trực Tuyến MoMo Gateway (Chuyển hướng sang MoMo - Cần tài khoản MoMo Doanh Nghiệp)
+                                </option>
+                            </select>
+                            <div class="form-text extra-small text-muted">
+                                Khi chọn <strong>"Ví MoMo Cá Nhân"</strong>, khách hàng sẽ quét mã QR chuyển tiền vào số MoMo của bạn và hệ thống SePay tự động duyệt đơn khi nhận được tiền (không cần GPKD).
+                            </div>
+                        </div>
+
+                        <!-- Môi trường -->
+                        <div class="col-md-6 mb-3">
+                            <label for="momo_gateway_env" class="form-label font-weight-medium text-dark">Môi Trường Kết Nối <span class="text-danger">*</span></label>
+                            @php
+                                $currentEnv = old('momo_gateway_env', $settings['momo_gateway_env'] ?? 'sandbox');
+                            @endphp
+                            <select class="form-select" id="momo_gateway_env" name="momo_gateway_env">
+                                <option value="sandbox" {{ $currentEnv === 'sandbox' ? 'selected' : '' }}>Thử nghiệm (Sandbox Test - test-payment.momo.vn)</option>
+                                <option value="production" {{ $currentEnv === 'production' ? 'selected' : '' }}>Chính thức (Production - payment.momo.vn)</option>
+                            </select>
+                            <div class="form-text extra-small text-muted">Mặc định dùng tài khoản Test Sandbox của MoMo để bạn thử nghiệm đặt đơn.</div>
+                        </div>
+
+                        <!-- Partner Code -->
+                        <div class="col-md-6 mb-3">
+                            <label for="momo_gateway_partner_code" class="form-label font-weight-medium text-dark">Partner Code (Mã đối tác) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control font-monospace" id="momo_gateway_partner_code" name="momo_gateway_partner_code" value="{{ old('momo_gateway_partner_code', $settings['momo_gateway_partner_code'] ?? 'MOMOBKUN20180529') }}" placeholder="VD: MOMOBKUN20180529">
+                        </div>
+
+                        <!-- Access Key -->
+                        <div class="col-md-6 mb-3">
+                            <label for="momo_gateway_access_key" class="form-label font-weight-medium text-dark">Access Key <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control font-monospace" id="momo_gateway_access_key" name="momo_gateway_access_key" value="{{ old('momo_gateway_access_key', $settings['momo_gateway_access_key'] ?? 'klm05TvNBzhg7h7j') }}" placeholder="VD: klm05TvNBzhg7h7j">
+                        </div>
+
+                        <!-- Secret Key -->
+                        <div class="col-md-6 mb-3">
+                            <label for="momo_gateway_secret_key" class="form-label font-weight-medium text-dark">Secret Key (Khóa bí mật) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control font-monospace" id="momo_gateway_secret_key" name="momo_gateway_secret_key" value="{{ old('momo_gateway_secret_key', $settings['momo_gateway_secret_key'] ?? 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa') }}" placeholder="VD: at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa">
+                        </div>
+
+                        <!-- Hướng dẫn URL cấu hình MoMo Business -->
+                        <div class="col-12">
+                            <div class="p-3 bg-light rounded-3 border">
+                                <h6 class="fw-bold text-dark extra-small mb-2 text-uppercase"><i class="fa-solid fa-link me-1 text-danger"></i>Đường dẫn cấu hình trên cổng MoMo Developer / Business:</h6>
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <span class="extra-small text-muted d-block">Return URL (Redirect sau khi thanh toán):</span>
+                                        <div class="d-flex align-items-center gap-1.5 mt-1">
+                                            <input type="text" class="form-control form-control-sm font-monospace bg-white" readonly value="{{ route('payment.momo.callback') }}" id="momo_return_url">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm flex-shrink-0" onclick="navigator.clipboard.writeText(document.getElementById('momo_return_url').value); alert('Đã copy Return URL!')">
+                                                <i class="fa-regular fa-copy"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <span class="extra-small text-muted d-block">IPN URL (Webhook nhận kết quả tức thì):</span>
+                                        <div class="d-flex align-items-center gap-1.5 mt-1">
+                                            <input type="text" class="form-control form-control-sm font-monospace bg-white" readonly value="{{ route('api.webhook.momo') }}" id="momo_ipn_url">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm flex-shrink-0" onclick="navigator.clipboard.writeText(document.getElementById('momo_ipn_url').value); alert('Đã copy IPN URL!')">
+                                                <i class="fa-regular fa-copy"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- ================= TAB 4: THÔNG BÁO TELEGRAM & WEBHOOK ================= -->

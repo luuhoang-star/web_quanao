@@ -31,14 +31,37 @@ class FlashSaleAndFeaturedSeeder extends Seeder
         DB::table('flash_sales')->truncate();
         Schema::enableForeignKeyConstraints();
 
-        // Lấy danh sách sản phẩm
         $products = Product::where('is_active', true)->get();
         if ($products->count() < 8) {
             return;
         }
 
-        // Chọn 8 sản phẩm đầu tiên làm Flash Sale đang hoạt động
-        $flashProducts = $products->take(8);
+        // Chọn 8 sản phẩm tiêu biểu đa dạng các danh mục (thể thao, sơ mi, polo, đầm, jean, balo, đồ ngủ, áo khoác)
+        $curatedSlugs = [
+            'ao-thun-the-thao-nike-pro-dri-fit-premium',
+            'ao-so-mi-nam-cong-so-zara-slimfit-chong-nhan',
+            'ao-polo-nam-classic-atino-navy-tham-hut',
+            'dam-xoe-nu-voan-hoa-nhi-vintage-dang-dai-dao-pho',
+            'quan-jean-nam-levis-501-original-fit-ben-bi',
+            'balo-the-thao-laptop-adidas-linear-core-chong-soc',
+            'bo-do-ngu-pajama-lua-satin-cao-cap-mem-min',
+            'ao-khoac-gio-nam-the-thao-sieu-nhe-khang-nuoc',
+        ];
+
+        $curated = Product::whereIn('slug', $curatedSlugs)->get()->keyBy('slug');
+        $flashProducts = collect();
+        foreach ($curatedSlugs as $slug) {
+            if ($curated->has($slug)) {
+                $flashProducts->push($curated->get($slug));
+            }
+        }
+
+        // Nếu thiếu sản phẩm, bổ sung từ danh sách chung
+        if ($flashProducts->count() < 8) {
+            $extra = $products->whereNotIn('id', $flashProducts->pluck('id'))->take(8 - $flashProducts->count());
+            $flashProducts = $flashProducts->merge($extra);
+        }
+
         $discountRates = [0.65, 0.70, 0.60, 0.75, 0.55, 0.68, 0.72, 0.50]; // Giảm từ 25% đến 50%
 
         foreach ($flashProducts as $idx => $product) {
@@ -63,7 +86,7 @@ class FlashSaleAndFeaturedSeeder extends Seeder
         }
 
         // Đánh dấu thêm một số sản phẩm khác là Nổi bật (không thuộc Flash Sale)
-        $remainingFeatured = $products->slice(8, 4);
+        $remainingFeatured = Product::where('is_active', true)->whereNotIn('id', $flashProducts->pluck('id'))->take(6)->get();
         foreach ($remainingFeatured as $product) {
             $product->update(['is_featured' => true]);
         }

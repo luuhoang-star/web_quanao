@@ -106,8 +106,6 @@ class ShopController extends Controller
      */
     public function flashSale(Request $request): View|RedirectResponse|JsonResponse
     {
-        $homeController = app(HomeController::class);
-        $homeController->getFlashSaleProducts();
 
         $flashSales = FlashSale::active()
             ->with(['product.category', 'product.images', 'product.variants'])

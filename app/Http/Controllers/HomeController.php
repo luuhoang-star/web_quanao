@@ -58,13 +58,14 @@ class HomeController extends Controller
             ->get();
 
         // Lấy danh sách Outfits phối sẵn hiển thị trên trang chủ
-        $outfits = Outfit::where('is_active', true)
+        $outfits = Outfit::with(['products.images', 'products.category'])
+            ->where('is_active', true)
             ->orderBy('sort_order', 'asc')
             ->orderBy('id', 'desc')
             ->get();
 
         // Lấy danh sách Đánh giá thực tế đã duyệt từ người dùng
-        $customerReviews = Review::with(['user', 'product'])
+        $customerReviews = Review::with(['user', 'product.images', 'images'])
             ->where('is_approved', true)
             ->orderBy('id', 'desc')
             ->take(15)

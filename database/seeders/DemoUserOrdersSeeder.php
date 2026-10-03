@@ -16,6 +16,7 @@ class DemoUserOrdersSeeder extends Seeder
     public function run(): void
     {
         Schema::disableForeignKeyConstraints();
+        DB::table('order_returns')->truncate();
         DB::table('order_status_histories')->truncate();
         DB::table('payments')->truncate();
         DB::table('order_items')->truncate();
@@ -225,6 +226,47 @@ class DemoUserOrdersSeeder extends Seeder
 
             // Tạo timeline lịch sử trạng thái đơn hàng (Order Status Histories)
             $this->createStatusTimeline($order, $oData['status'], $oData['created_at'], $oData['updated_at']);
+        }
+
+        // Tạo 2 đơn yêu cầu đổi trả mẫu để trang Quản lý Đổi trả (Admin Returns) có dữ liệu
+        $completedOrder = Order::where('status', 'completed')->first();
+        if ($completedOrder) {
+            DB::table('order_returns')->insert([
+                [
+                    'order_id' => $completedOrder->id,
+                    'user_id' => $completedOrder->user_id,
+                    'type' => 'exchange',
+                    'reason' => 'Sản phẩm hơi chật, muốn đổi sang size lớn hơn',
+                    'note' => 'Áo còn nguyên tem mác, chưa qua giặt ủi, nhờ shop hỗ trợ đổi từ size M sang size L giúp mình.',
+                    'images' => json_encode(['products/ao-thun-nam-1.jpg']),
+                    'bank_name' => null,
+                    'bank_account_number' => null,
+                    'bank_account_holder' => null,
+                    'status' => 'pending',
+                    'admin_note' => null,
+                    'processed_by' => null,
+                    'processed_at' => null,
+                    'created_at' => now()->subDay(),
+                    'updated_at' => now()->subDay(),
+                ],
+                [
+                    'order_id' => $completedOrder->id,
+                    'user_id' => $completedOrder->user_id,
+                    'type' => 'return',
+                    'reason' => 'Đặt nhầm màu sản phẩm',
+                    'note' => 'Mình đặt nhầm màu áo sơ mi, muốn hoàn lại sản phẩm và nhận hoàn tiền qua STK ngân hàng.',
+                    'images' => json_encode(['products/ao-so-mi-nam-1.jpg']),
+                    'bank_name' => 'MB Bank',
+                    'bank_account_number' => '0987654321',
+                    'bank_account_holder' => 'NGUYEN VAN AN',
+                    'status' => 'approved',
+                    'admin_note' => 'Đã tiếp nhận yêu cầu và hẹn shipper thu hồi hàng ngày mai.',
+                    'processed_by' => 1,
+                    'processed_at' => now()->subHours(5),
+                    'created_at' => now()->subDays(2),
+                    'updated_at' => now()->subHours(5),
+                ],
+            ]);
         }
     }
 

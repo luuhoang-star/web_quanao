@@ -14,11 +14,13 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\StockMovement;
 use App\Services\CartService;
+use App\Services\MoMoService;
 use App\Services\TelegramNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -446,7 +448,25 @@ class OrderController extends Controller
                 Log::error("Failed to send Telegram notify: {$tgEx->getMessage()}");
             }
 
-            return redirect()->route('orders.show', $order->order_code)->with('success', 'Đặt hàng thành công! Mã đơn hàng của bạn là #'.$order->order_code);
+            // Nếu thanh toán qua Cổng MoMo Doanh nghiệp (khi bật chế độ gateway)
+            $siteSettings = Cache::get('site_settings', []);
+            $momoMode = $siteSettings['momo_mode'] ?? 'personal';
+
+            if ($request->payment_method === 'momo' && $momoMode === 'gateway') {
+                $momoResult = MoMoService::createPayment($order);
+                if ($momoResult['success'] && ! empty($momoResult['payUrl'])) {
+                    return redirect()->away($momoResult['payUrl']);
+                }
+
+                return redirect()->route('orders.show', $order->order_code)
+                    ->with('warning', 'Đặt hàng thành công! Kết nối cổng MoMo: '.($momoResult['message'] ?? 'vui lòng thử lại').'. Bạn có thể nhấn thanh toán lại trong đơn hàng.');
+            }
+
+            $successMsg = $request->payment_method === 'momo'
+                ? 'Đặt hàng thành công! Vui lòng quét mã MoMo để hoàn tất thanh toán cho đơn hàng #'.$order->order_code
+                : 'Đặt hàng thành công! Mã đơn hàng của bạn là #'.$order->order_code;
+
+            return redirect()->route('orders.show', $order->order_code)->with('success', $successMsg);
         } catch (\Exception $e) {
             return back()->withInput()->with('error', $e->getMessage());
         }
@@ -509,6 +529,35 @@ class OrderController extends Controller
             ->firstOrFail();
 
         return view('orders.show', compact('order'));
+    }
+
+    /**
+     * Kiểm tra trạng thái thanh toán đơn hàng theo thời gian thực (Polling khi quét QR MoMo / VietQR).
+     */
+    public function checkPaymentStatus(string $order_code): JsonResponse
+    {
+        $order = Order::with('payment')
+            ->where('order_code', $order_code)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (! $order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Đơn hàng không tồn tại',
+            ], 404);
+        }
+
+        $payment = $order->payment;
+        $isPaid = $payment && in_array($payment->payment_status, ['paid', 'completed']);
+
+        return response()->json([
+            'success' => true,
+            'is_paid' => $isPaid,
+            'order_status' => $order->status,
+            'payment_status' => $payment?->payment_status ?? 'pending',
+            'updated_at' => $payment?->updated_at?->format('H:i:s d/m/Y'),
+        ]);
     }
 
     /**

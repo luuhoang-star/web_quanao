@@ -66,8 +66,8 @@
 
                     <!-- Image Thumbnail -->
                     <a href="{{ route('shop.show', $product->slug) }}" class="position-relative overflow-hidden d-block">
-                        @if($thumb && $thumb->image_url)
-                            <img src="{{ asset('storage/' . $thumb->image_url) }}" class="card-img-top" alt="{{ $product->name }}" style="height: 240px; object-fit: cover;">
+                        @if($thumb)
+                            <img src="{{ $thumb->display_url }}" class="card-img-top" alt="{{ $product->name }}" style="height: 240px; object-fit: cover;">
                         @else
                             <div class="bg-light d-flex align-items-center justify-content-center text-muted" style="height: 240px;">
                                 <i class="fa-solid fa-shirt fa-4x opacity-50"></i>

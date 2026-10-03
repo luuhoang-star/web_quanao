@@ -148,7 +148,7 @@
                                     <td>
                                         <div class="d-flex align-items-center gap-2">
                                             @if($item->product && $item->product->primaryImage)
-                                                <img src="{{ asset('storage/' . $item->product->primaryImage->image_url) }}" alt="" style="width: 42px; height: 42px; object-fit: cover;" class="rounded border">
+                                                <img src="{{ $item->product->primaryImage->display_url }}" alt="" style="width: 42px; height: 42px; object-fit: cover;" class="rounded border">
                                             @endif
                                             <span class="fw-semibold text-dark">{{ $item->product_name ?? ($item->product->name ?? 'Sản phẩm') }}</span>
                                         </div>

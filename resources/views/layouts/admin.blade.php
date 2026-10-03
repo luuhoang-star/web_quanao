@@ -357,6 +357,8 @@
                 <span>&copy; 2026 Quần Áo Store Admin Panel. Hỗ trợ hệ thống Laravel 12.</span>
             </div>
         </footer>
+    </div>
+
     <!-- jQuery CDN -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <!-- Bootstrap 5 JS Bundle CDN -->

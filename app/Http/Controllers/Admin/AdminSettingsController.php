@@ -65,6 +65,15 @@ class AdminSettingsController extends Controller
             'telegram_notify_order' => true,
             'telegram_notify_return' => true,
 
+            // Chế độ MoMo: 'personal' (Ví MoMo cá nhân quét QR & SePay) hoặc 'gateway' (Cổng MoMo Business API)
+            'momo_mode' => 'personal',
+
+            // Cấu hình Cổng thanh toán MoMo Gateway (v2)
+            'momo_gateway_partner_code' => 'MOMOBKUN20180529',
+            'momo_gateway_access_key' => 'klm05TvNBzhg7h7j',
+            'momo_gateway_secret_key' => 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa',
+            'momo_gateway_env' => 'sandbox',
+
             // Cấu hình Webhook xác nhận thanh toán tự động (SePay / Casso / Ngân hàng)
             'webhook_api_key' => 'ATINO_SECURE_KEY_'.date('Y'),
             'auto_confirm_payment' => true,
@@ -120,6 +129,13 @@ class AdminSettingsController extends Controller
             'bank_transfer_syntax' => ['nullable', 'string', 'max:20'],
             'momo_phone' => ['nullable', 'string', 'max:20'],
             'momo_name' => ['nullable', 'string', 'max:100'],
+
+            // Cổng MoMo
+            'momo_mode' => ['nullable', 'string', 'in:personal,gateway'],
+            'momo_gateway_partner_code' => ['nullable', 'string', 'max:100'],
+            'momo_gateway_access_key' => ['nullable', 'string', 'max:100'],
+            'momo_gateway_secret_key' => ['nullable', 'string', 'max:150'],
+            'momo_gateway_env' => ['nullable', 'string', 'in:sandbox,production'],
         ], [
             'store_name.required' => 'Vui lòng nhập tên cửa hàng.',
             'hotline.required' => 'Vui lòng nhập số hotline liên hệ.',
@@ -188,6 +204,13 @@ class AdminSettingsController extends Controller
             // Cấu hình Webhook
             'webhook_api_key' => trim((string) $request->input('webhook_api_key', 'ATINO_SECURE_KEY')),
             'auto_confirm_payment' => $request->has('auto_confirm_payment'),
+
+            // Cổng MoMo
+            'momo_mode' => $request->input('momo_mode', 'personal') ?: 'personal',
+            'momo_gateway_partner_code' => trim((string) $request->input('momo_gateway_partner_code', 'MOMOBKUN20180529')),
+            'momo_gateway_access_key' => trim((string) $request->input('momo_gateway_access_key', 'klm05TvNBzhg7h7j')),
+            'momo_gateway_secret_key' => trim((string) $request->input('momo_gateway_secret_key', 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa')),
+            'momo_gateway_env' => $request->input('momo_gateway_env', 'sandbox') ?: 'sandbox',
         ]);
 
         Cache::forever('site_settings', $settings);

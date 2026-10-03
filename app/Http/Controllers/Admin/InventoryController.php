@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\StockMovement;
 use App\Services\InventoryService;
@@ -89,14 +90,45 @@ class InventoryController extends Controller
             ]);
         }
 
-        $categories = Category::orderBy('name', 'asc')->get();
-        $allVariants = ProductVariant::with(['product', 'color', 'size'])->orderBy('sku', 'asc')->get();
+        $categories = Category::with(['parent', 'children'])->orderBy('name', 'asc')->get();
+
+        $inventoryProducts = Product::with([
+            'category.parent',
+            'images',
+            'variants.color',
+            'variants.size',
+        ])
+            ->where('is_active', true)
+            ->orderBy('name', 'asc')
+            ->get()
+            ->map(function ($p) {
+                $catName = $p->category ? ($p->category->parent ? $p->category->parent->name.' > '.$p->category->name : $p->category->name) : 'Khác';
+
+                return [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'category_id' => $p->category_id,
+                    'category_name' => $catName,
+                    'image_url' => $p->image_url,
+                    'variants' => $p->variants->map(function ($v) {
+                        return [
+                            'id' => $v->id,
+                            'sku' => $v->sku,
+                            'color_name' => $v->color?->name ?? 'Mặc định',
+                            'color_hex' => $v->color?->hex_code ?? '#cccccc',
+                            'size_name' => $v->size?->name ?? 'FS',
+                            'stock_quantity' => (int) $v->stock_quantity,
+                            'cost_price' => (float) ($v->cost_price ?? 0),
+                        ];
+                    })->values(),
+                ];
+            });
 
         return view('admin.inventory.index', compact(
             'stats',
             'variants',
             'categories',
-            'allVariants',
+            'inventoryProducts',
             'reservedStockMap',
             'activeFilterCount',
             'sortBy',

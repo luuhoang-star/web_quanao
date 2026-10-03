@@ -573,8 +573,7 @@
                                         @if($item->product)
                                             @php
                                                 $prod = $item->product;
-                                                $realPhoto = "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&auto=format&fit=crop&q=80";
-                                                $thumbSrc = ($prod->images->count() > 0 && $prod->images->first()->image_path) ? asset('storage/' . $prod->images->first()->image_path) : $realPhoto;
+                                                $thumbSrc = $prod->image_url;
                                             @endphp
                                             <div class="col-6 col-md-4">
                                                 <div class="card h-100 border p-2 rounded-3 text-center atino-product-card position-relative">

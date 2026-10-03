@@ -144,7 +144,7 @@
                             @if($review->images && $review->images->isNotEmpty())
                                 <div class="d-flex gap-1 mt-1 mb-2">
                                     @foreach($review->images as $img)
-                                        <img src="{{ asset('storage/' . $img->image_url) }}" class="rounded border" style="width: 40px; height: 40px; object-fit: cover;">
+                                        <img src="{{ $img->display_url }}" class="rounded border" style="width: 40px; height: 40px; object-fit: cover;">
                                     @endforeach
                                 </div>
                             @endif

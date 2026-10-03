@@ -24,7 +24,7 @@
             $percent = $product->discount_percent;
             $isWishlisted = Auth::check() && Auth::user()->wishlists->contains('product_id', $product->id);
             $realPhoto = $realFashionPhotos[$product->id % count($realFashionPhotos)];
-            $imgSrc = ($thumb && $thumb->image_path) ? asset('storage/' . $thumb->image_path) : (($thumb && $thumb->image_url) ? asset('storage/' . $thumb->image_url) : $realPhoto);
+            $imgSrc = $thumb ? $thumb->display_url : $product->image_url;
         @endphp
         <div class="col-6 col-sm-6 col-md-4">
             <div class="card h-100 border-0 rounded-4 shadow-sm atino-product-card bg-white overflow-hidden position-relative">
@@ -129,7 +129,7 @@
                             $sPercent = $sp->discount_percent;
                             $sIsWishlisted = Auth::check() && Auth::user()->wishlists->contains('product_id', $sp->id);
                             $sRealPhoto = $realFashionPhotos[$sp->id % count($realFashionPhotos)];
-                            $sImgSrc = ($sThumb && $sThumb->image_path) ? asset('storage/' . $sThumb->image_path) : (($sThumb && $sThumb->image_url) ? asset('storage/' . $sThumb->image_url) : $sRealPhoto);
+                            $sImgSrc = $sThumb ? $sThumb->display_url : $sp->image_url;
                         @endphp
                         <div class="col-6 col-md-3">
                             <div class="card h-100 border rounded-3 shadow-2xs atino-product-card bg-white overflow-hidden position-relative">

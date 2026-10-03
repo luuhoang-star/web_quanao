@@ -3,8 +3,9 @@
     $headerNavCategories = \App\Models\Category::whereNull('parent_id')
         ->where('is_active', true)
         ->with(['children' => function($q) {
-            $q->where('is_active', true);
+            $q->where('is_active', true)->orderBy('sort_order', 'asc');
         }])
+        ->orderBy('sort_order', 'asc')
         ->get();
 @endphp
 
@@ -92,6 +93,21 @@
         background-color: #f1f5f9;
         font-weight: 600;
     }
+
+    .header-search-box {
+        width: 280px;
+        transition: width 0.2s ease;
+    }
+    @media (max-width: 991.98px) {
+        .header-search-box {
+            width: 200px;
+        }
+    }
+    @media (max-width: 575.98px) {
+        .header-search-box {
+            width: 150px;
+        }
+    }
 </style>
 
 <!-- Top Promo Announcement Bar -->
@@ -155,21 +171,21 @@
             </nav>
 
             <!-- 3. Ô tìm kiếm bo tròn pill, User dropdown & Giỏ hàng góc phải -->
-            <div class="d-flex align-items-center gap-3 ms-auto">
+            <div class="d-flex align-items-center gap-2 gap-sm-3 ms-auto">
                 <!-- Form tìm kiếm pill xám nhạt tích hợp Live Search -->
-                <div class="position-relative" id="header-search-wrapper" style="width: 280px;">
+                <div class="position-relative header-search-box" id="header-search-wrapper">
                     <form action="{{ route('shop.index') }}" method="GET" class="d-flex align-items-center m-0">
                         <div class="position-relative w-100">
                             <span class="position-absolute start-0 top-50 translate-middle-y ms-3 text-muted" style="z-index: 5;">
                                 <i class="fa-solid fa-magnifying-glass fs-6"></i>
                             </span>
-                            <input type="text" id="header-search-input" name="search" autocomplete="off" class="form-control rounded-pill ps-5 pe-3 py-2 border-0 text-dark small search-input-minimal w-100" placeholder="Tìm kiếm áo, quần, váy..." value="{{ request('search') }}" style="background-color: #f1f5f9 !important;">
+                            <input type="text" id="header-search-input" name="search" autocomplete="off" class="form-control rounded-pill ps-5 pe-3 py-2 border-0 text-dark small search-input-minimal w-100" placeholder="Tìm kiếm..." value="{{ request('search') }}" style="background-color: #f1f5f9 !important;">
                             <span id="search-spinner" class="position-absolute end-0 top-50 translate-middle-y me-3 text-muted spinner-border spinner-border-sm d-none" style="z-index: 5;"></span>
                         </div>
                     </form>
 
                     <!-- Dropdown Gợi Ý Tìm Kiếm Trực Tiếp (Live Search Dropdown) -->
-                    <div id="header-live-search-dropdown" class="position-absolute bg-white rounded-4 shadow-lg border border-slate-200 p-2 mt-2 d-none" style="top: 100%; right: 0; width: 340px; z-index: 1060; max-height: 420px; overflow-y: auto;">
+                    <div id="header-live-search-dropdown" class="position-absolute bg-white rounded-4 shadow-lg border border-slate-200 p-2 mt-2 d-none" style="top: 100%; right: 0; width: 340px; max-width: calc(100vw - 2rem); z-index: 1060; max-height: 420px; overflow-y: auto;">
                         <div id="live-search-content"></div>
                     </div>
                 </div>

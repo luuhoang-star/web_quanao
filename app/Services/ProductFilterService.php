@@ -171,12 +171,22 @@ class ProductFilterService
             $sizeCounts = collect();
         }
 
+        $priceAggregates = (clone $baseCountQuery)
+            ->selectRaw("
+                COUNT(*) as total,
+                COUNT(CASE WHEN {$effectivePriceSql} < 300000 THEN 1 END) as under_300,
+                COUNT(CASE WHEN {$effectivePriceSql} >= 300000 AND {$effectivePriceSql} <= 500000 THEN 1 END) as p300_500,
+                COUNT(CASE WHEN {$effectivePriceSql} > 500000 AND {$effectivePriceSql} <= 1000000 THEN 1 END) as p500_1000,
+                COUNT(CASE WHEN {$effectivePriceSql} > 1000000 THEN 1 END) as over_1000
+            ")
+            ->first();
+
         $priceCounts = [
-            'all' => (clone $baseCountQuery)->count(),
-            'under_300' => (clone $baseCountQuery)->whereRaw("{$effectivePriceSql} < 300000")->count(),
-            '300_500' => (clone $baseCountQuery)->whereRaw("{$effectivePriceSql} BETWEEN 300000 AND 500000")->count(),
-            '500_1000' => (clone $baseCountQuery)->whereRaw("{$effectivePriceSql} BETWEEN 500000 AND 1000000")->count(),
-            'over_1000' => (clone $baseCountQuery)->whereRaw("{$effectivePriceSql} > 1000000")->count(),
+            'all' => (int) ($priceAggregates->total ?? 0),
+            'under_300' => (int) ($priceAggregates->under_300 ?? 0),
+            '300_500' => (int) ($priceAggregates->p300_500 ?? 0),
+            '500_1000' => (int) ($priceAggregates->p500_1000 ?? 0),
+            'over_1000' => (int) ($priceAggregates->over_1000 ?? 0),
         ];
 
         $colors = Color::where('is_active', true)->get()->map(function ($cl) use ($colorCounts, $selectedColors) {

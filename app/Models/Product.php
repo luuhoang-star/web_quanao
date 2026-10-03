@@ -146,4 +146,35 @@ class Product extends Model
             ->withPivot('sort_order')
             ->withTimestamps();
     }
+
+    /**
+     * Lấy URL ảnh đại diện hiển thị của sản phẩm (hỗ trợ cả local storage và URL ngoài).
+     */
+    public function getImageUrlAttribute(): string
+    {
+        if ($this->relationLoaded('images') && $this->images->isNotEmpty()) {
+            $thumb = $this->images->firstWhere('is_thumbnail', true) ?: $this->images->first();
+
+            return $thumb->display_url;
+        }
+
+        if ($this->relationLoaded('primaryImage') && $this->primaryImage) {
+            return $this->primaryImage->display_url;
+        }
+
+        $thumb = $this->primaryImage ?: $this->images->first();
+        if ($thumb && method_exists($thumb, 'getDisplayUrlAttribute')) {
+            return $thumb->display_url;
+        }
+
+        return 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80';
+    }
+
+    /**
+     * Alias cho getImageUrlAttribute.
+     */
+    public function getDisplayImageUrlAttribute(): string
+    {
+        return $this->image_url;
+    }
 }

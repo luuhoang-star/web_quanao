@@ -58,8 +58,8 @@
 
                         <!-- Image -->
                         <a href="{{ route('shop.show', $product->slug) }}" class="text-decoration-none position-relative d-block overflow-hidden bg-light" style="padding-top: 120%;">
-                            @if($thumbnail && $thumbnail->image_url)
-                                <img src="{{ asset('storage/' . $thumbnail->image_url) }}" alt="{{ $product->name }}" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover transition-transform">
+                            @if($thumbnail)
+                                <img src="{{ $thumbnail->display_url }}" alt="{{ $product->name }}" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover transition-transform">
                             @else
                                 <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center text-muted">
                                     <i class="fa-solid fa-shirt fa-4x opacity-25"></i>

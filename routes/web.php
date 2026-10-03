@@ -22,6 +22,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MoMoPaymentController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OutfitController;
 use App\Http\Controllers\PageController;
@@ -53,6 +54,10 @@ Route::post('/newsletter/subscribe', [PageController::class, 'subscribeNewslette
 
 // Webhook Tự Động Xác Nhận Thanh Toán Chuyển Khoản (SePay, Casso, Ngân hàng)
 Route::match(['get', 'post'], '/api/webhook/payment', [PaymentWebhookController::class, 'handle'])->name('api.webhook.payment');
+
+// Cổng thanh toán MoMo (Return Callback & IPN Webhook)
+Route::get('/payment/momo/callback', [MoMoPaymentController::class, 'callback'])->name('payment.momo.callback');
+Route::post('/api/webhook/momo', [MoMoPaymentController::class, 'ipn'])->name('api.webhook.momo');
 
 // SEO Routes (Sitemap XML & Robots.txt)
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('seo.sitemap');
@@ -128,10 +133,12 @@ Route::middleware(['auth:web', 'check.banned'])->group(function () {
     Route::post('/checkout', [OrderController::class, 'processCheckout'])->name('orders.processCheckout');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order_code}', [OrderController::class, 'show'])->name('orders.show');
+    Route::get('/orders/{order_code}/check-payment-status', [OrderController::class, 'checkPaymentStatus'])->name('orders.checkPaymentStatus');
     Route::get('/orders/{order_code}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
     Route::post('/orders/{order}/reorder', [OrderController::class, 'reorder'])->name('orders.reorder');
     Route::post('/orders/{order}/return', [OrderController::class, 'requestReturn'])->name('orders.requestReturn');
+    Route::post('/orders/{order}/momo-pay', [MoMoPaymentController::class, 'create'])->name('orders.momoPay');
 
     // Đánh giá sản phẩm (Reviews)
     Route::post('/product/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');

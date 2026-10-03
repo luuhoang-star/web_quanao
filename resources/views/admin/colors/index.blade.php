@@ -59,10 +59,9 @@
         <input type="hidden" name="action" id="color_bulk_action_input">
 
         <div id="colorBulkBar" class="bg-primary-subtle border-bottom p-2.5 px-3 d-none align-items-center justify-content-between">
-                <span class="fw-bold text-primary small">
-                    <i class="fa-solid fa-check-double me-1"></i>Đã chọn <span id="colorSelectedCount">0</span> màu sắc
-                </span>
-            </div>
+            <span class="fw-bold text-primary small">
+                <i class="fa-solid fa-check-double me-1"></i>Đã chọn <span id="colorSelectedCount">0</span> màu sắc
+            </span>
             <div class="d-flex align-items-center gap-2">
                 <button type="button" class="btn btn-sm btn-danger" onclick="submitColorBulk('delete')">
                     <i class="fa-solid fa-trash-can me-1"></i> Xóa màu đã chọn
