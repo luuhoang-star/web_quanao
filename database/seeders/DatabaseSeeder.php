@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class DatabaseSeeder extends Seeder
 {
@@ -11,6 +12,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        Schema::disableForeignKeyConstraints();
+
         $this->call([
             // 1. Phân quyền & Người dùng
             RoleSeeder::class,
@@ -48,5 +51,7 @@ class DatabaseSeeder extends Seeder
             // 9. Giỏ hàng & Danh sách yêu thích mẫu
             CartAndWishlistSeeder::class,
         ]);
+
+        Schema::enableForeignKeyConstraints();
     }
 }

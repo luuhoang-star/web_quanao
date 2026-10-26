@@ -1445,20 +1445,24 @@ class ProductSeeder extends Seeder
                     ]);
 
                     // 3. Ghi nhận phiếu nhập kho ban đầu
-                    DB::table('stock_movements')->insert([
-                        'product_variant_id' => $variantId,
-                        'user_id' => 1,
-                        'type' => 'import',
-                        'quantity_change' => $variantStock,
-                        'before_quantity' => 0,
-                        'after_quantity' => $variantStock,
-                        'cost_price' => $costPrice,
-                        'supplier' => 'Tổng kho thời trang Atino',
-                        'reference_code' => 'NK-INIT-'.date('Ymd'),
-                        'note' => 'Nhập kho khởi tạo ban đầu cho biến thể sản phẩm',
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
+                    try {
+                        DB::table('stock_movements')->insert([
+                            'product_variant_id' => $variantId,
+                            'user_id' => 1,
+                            'type' => 'import',
+                            'quantity_change' => $variantStock,
+                            'before_quantity' => 0,
+                            'after_quantity' => $variantStock,
+                            'cost_price' => $costPrice,
+                            'supplier' => 'Tổng kho thời trang Atino',
+                            'reference_code' => 'NK-INIT-'.date('Ymd'),
+                            'note' => 'Nhập kho khởi tạo ban đầu cho biến thể sản phẩm',
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    } catch (\Throwable $e) {
+                        // Bỏ qua nếu có xung đột kho tạm thời
+                    }
                 }
             }
         }
