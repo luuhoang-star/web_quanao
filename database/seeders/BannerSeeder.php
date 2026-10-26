@@ -13,6 +13,10 @@ class BannerSeeder extends Seeder
      */
     public function run(): void
     {
+        if (! Schema::hasTable('banners')) {
+            return;
+        }
+
         Schema::disableForeignKeyConstraints();
         DB::table('banners')->truncate();
         Schema::enableForeignKeyConstraints();
